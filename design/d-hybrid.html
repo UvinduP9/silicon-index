@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Silicon Index · D. Hybrid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap" rel="stylesheet">
+<style>
+/* Pure black, full contrast. Surfaces are separated by hairlines, not grey fills. */
+:root {
+  --bg: #000000; --raise: #0D0D0D; --line: #222222; --line-2: #333333;
+  --text: #FFFFFF; --muted: #9A9A9A; --faint: #5E5E5E; --ring: #FFFFFF;
+  /* Tier colors are sampled from the heat ramp: hotter tier, hotter color. */
+  --base: #D2477E; --pro: #EE6A3C; --max: #F6AE45; --ultra: #FCE89A;
+  --ref: #9A9A9A; --up: #F6AE45; --down: #9C8FB2;
+}
+[data-theme="light"] {
+  --bg: #FFFFFF; --raise: #F4F4F4; --line: #E4E4E4; --line-2: #CFCFCF;
+  --text: #000000; --muted: #5C5C5C; --faint: #A0A0A0; --ring: #000000;
+  --base: #A8285E; --pro: #C9461B; --max: #B87708; --ultra: #7A6400;
+  --ref: #6B6B6B; --up: #C9461B; --down: #6E6380;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font: 400 15px/24px "Bricolage Grotesque", system-ui, sans-serif; font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 6px; }
+
+.top { display: flex; align-items: center; gap: 28px; padding: 16px 40px; border-bottom: 1px solid var(--line); }
+.wordmark { font-weight: 750; font-size: 18px; font-variation-settings: "opsz" 24; }
+.tabs { display: flex; gap: 2px; }
+.tab { padding: 6px 12px; border-radius: 8px; color: var(--muted); font-weight: 500; }
+.tab:hover { color: var(--text); }
+.tab[aria-selected="true"] { color: var(--text); background: var(--raise); box-shadow: inset 0 0 0 1px var(--line-2); }
+.spacer { flex: 1; }
+.seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 10px; padding: 2px; }
+.seg button { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 7px; color: var(--muted); font-size: 14px; font-weight: 500; }
+.seg button:hover { color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.seg.small button { padding: 3px 10px; font-size: 13px; }
+.theme { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; color: var(--muted); }
+.theme:hover { color: var(--text); background: var(--raise); }
+
+.wrap { max-width: 1320px; margin: 0 auto; padding: 0 40px 64px; }
+h1 { margin: 44px 0 6px; font-size: 40px; line-height: 44px; font-weight: 650; letter-spacing: -0.02em; font-variation-settings: "opsz" 72; max-width: 30ch; text-wrap: balance; }
+.lede { margin: 0 0 28px; color: var(--muted); max-width: 66ch; }
+.view { animation: viewIn 220ms ease; }
+@keyframes viewIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Grid view */
+.grid { display: grid; grid-template-columns: 64px repeat(6, minmax(0, 1fr)); gap: 3px; }
+.colhead { padding: 0 4px 10px; }
+.colhead b { font-weight: 650; }
+.colhead span { color: var(--faint); font-size: 13px; margin-left: 6px; }
+.rowhead { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; font-weight: 500; }
+.rowhead i { width: 8px; height: 8px; border-radius: 50%; }
+.tile {
+  position: relative; min-height: 112px; border-radius: 6px; padding: 12px 14px;
+  display: flex; flex-direction: column; justify-content: space-between; text-align: left;
+  transition: background-color 450ms ease, color 450ms ease;
+}
+.tile .nm { font-size: 24px; line-height: 26px; font-weight: 700; letter-spacing: -0.02em; font-variation-settings: "opsz" 96; }
+.tile .v { font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 500; }
+.tile .v small { font-size: 12px; opacity: 0.7; margin-left: 2px; }
+.tile .est { font-size: 12px; opacity: 0.75; }
+.tile:hover { filter: brightness(1.1); }
+.tile[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--ring), 0 0 0 2px var(--bg); }
+.badge { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--ring); color: var(--bg); }
+.gap { min-height: 112px; border-radius: 6px; border: 1.5px dashed var(--line-2); display: flex; align-items: flex-end; padding: 12px 14px; color: var(--faint); font-size: 13px; }
+.under { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; margin: 18px 0 0 67px; flex-wrap: wrap; }
+.legend { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.ramp { width: 220px; height: 10px; border-radius: 5px; }
+.scale-row { display: flex; gap: 3px; align-items: stretch; }
+.scale-row .lab { color: var(--muted); font-size: 13px; align-self: center; margin-right: 10px; }
+.scale-row .tile, .scale-row .gap { min-height: 64px; width: 190px; padding: 10px 12px; }
+.scale-row .tile .nm { font-size: 16px; line-height: 20px; font-variation-settings: "opsz" 24; }
+
+/* Lines view */
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; margin-bottom: 8px; }
+.toggles { display: flex; gap: 6px; flex-wrap: wrap; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--line-2); font-size: 14px; }
+.toggle i { width: 9px; height: 9px; border-radius: 50%; }
+.toggle[aria-pressed="false"] { color: var(--faint); border-color: var(--line); }
+.toggle[aria-pressed="false"] i { background: transparent !important; box-shadow: inset 0 0 0 1.5px var(--faint); }
+.toolbar .lab { color: var(--faint); font-size: 13px; }
+.chart-wrap { position: relative; }
+svg.chart { display: block; overflow: visible; font-variant-numeric: tabular-nums; }
+.axis text { fill: var(--muted); font-size: 13px; }
+.axis .year { fill: var(--faint); font-size: 12px; }
+.gridlines line { stroke: var(--line); }
+.series path { fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.series .pt.est { fill: var(--bg) !important; }
+.end-label { font-weight: 650; font-size: 14px; }
+.end-value { fill: var(--muted); font-size: 12px; }
+.refl line { stroke: var(--ref); stroke-dasharray: 4 5; stroke-width: 1.25; }
+.refl text { fill: var(--muted); font-size: 12px; }
+.ring { fill: none; stroke: var(--ring); stroke-width: 2; pointer-events: none; }
+.ring-badge { fill: var(--ring); }
+.ring-badge-t { fill: var(--bg); font-size: 11px; font-weight: 700; }
+.tip { position: absolute; pointer-events: none; min-width: 190px; background: var(--raise); border: 1px solid var(--line-2); border-radius: 10px; padding: 10px 12px; font-size: 13px; line-height: 20px; opacity: 0; transition: opacity 120ms; }
+.tip.on { opacity: 1; }
+.tip .big { font-size: 20px; font-weight: 700; line-height: 28px; font-variant-numeric: tabular-nums; }
+.tip .m { color: var(--muted); }
+.note { color: var(--faint); font-size: 13px; margin-top: 6px; }
+
+/* Head-to-head, shared by both views */
+.h2h { margin-top: 48px; border-top: 1px solid var(--line); padding-top: 28px; }
+.h2h-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.h2h h2 { margin: 0; font-size: 32px; line-height: 36px; font-weight: 700; letter-spacing: -0.02em; font-variation-settings: "opsz" 72; }
+.h2h h2 .vs { color: var(--faint); font-weight: 400; margin: 0 10px; }
+.h2h .hint { color: var(--muted); font-size: 14px; }
+.rows { margin-top: 20px; display: grid; grid-template-columns: 150px 120px minmax(0, 1fr) 140px; gap: 10px 20px; align-items: center; font-variant-numeric: tabular-nums; }
+.rows .k { color: var(--muted); font-size: 14px; }
+.rows .a { text-align: right; }
+.rows .b { font-weight: 600; }
+.div { position: relative; height: 22px; }
+.div::before { content: ""; position: absolute; left: 50%; top: -4px; bottom: -4px; width: 1px; background: var(--line-2); }
+.div i { position: absolute; top: 6px; height: 10px; border-radius: 3px; }
+.div i.up { left: 50%; background: var(--up); }
+.div i.down { right: 50%; background: var(--down); }
+.pct { display: block; font-size: 13px; font-weight: 500; line-height: 16px; }
+.pct.up { color: var(--up); } .pct.down { color: var(--down); }
+.rows .sep { grid-column: 1 / -1; height: 1px; background: var(--line); margin: 6px 0; }
+.ships { color: var(--muted); font-size: 14px; }
+.foot { color: var(--faint); font-size: 13px; margin-top: 32px; }
+
+@media (max-width: 900px) {
+  .top { flex-wrap: wrap; gap: 10px 16px; padding: 14px 16px; }
+  .tabs { order: 3; width: 100%; overflow-x: auto; }
+  .wrap { padding: 0 16px 48px; }
+  h1 { font-size: 28px; line-height: 32px; margin-top: 28px; }
+  .grid-scroll { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+  .grid { min-width: 720px; }
+  .under { margin-left: 0; }
+  .scale-row { width: 100%; overflow-x: auto; }
+  .scale-row .tile, .scale-row .gap { flex: none; width: 160px; }
+  .rows { grid-template-columns: 90px 72px minmax(0, 1fr) 76px; gap: 8px 10px; font-size: 14px; }
+  .seg .lbl { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wordmark">Silicon Index</div>
+  <nav class="tabs" role="tablist" aria-label="Metric" id="tabs"></nav>
+  <div class="spacer"></div>
+  <div class="seg" role="group" aria-label="View" id="viewSeg">
+    <button data-view="grid" title="Grid view">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.2"/><rect x="9" y="1" width="6" height="6" rx="1.2"/><rect x="1" y="9" width="6" height="6" rx="1.2"/><rect x="9" y="9" width="6" height="6" rx="1.2"/></svg>
+      <span class="lbl">Grid</span>
+    </button>
+    <button data-view="lines" title="Lines view">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 13 6 8.5l3 2.5 5.5-7"/></svg>
+      <span class="lbl">Lines</span>
+    </button>
+  </div>
+  <button class="theme" id="theme" aria-label="Switch to light mode" title="Switch theme">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+  </button>
+</header>
+
+<div class="wrap">
+  <h1 id="title"></h1>
+  <p class="lede" id="lede"></p>
+  <div id="view"></div>
+  <section class="h2h" id="h2h" aria-live="polite"></section>
+  <p class="foot">Prototype. Sample Geekbench 6 numbers, not yet verified.</p>
+</div>
+
+<script src="data.js"></script>
+<script>
+const D = window.SI;
+const q = new URLSearchParams(location.search);
+if (q.get("theme") === "light") document.documentElement.dataset.theme = "light";
+const state = {
+  view: q.get("view") || "grid",
+  metric: q.get("m") || "mc",
+  picks: (q.get("pick") || "m1,m6").split(","),
+  tiers: new Set(["base", "pro", "max", "ultra"]),
+  refs: new Set(["ultra9-285hx"]),
+  scale: "linear",
+};
+const all = [...D.chips, ...D.references];
+const byId = Object.fromEntries(all.map((c) => [c.id, c]));
+const fmt = (v) => v == null ? "–" : v.toLocaleString("en-US").replace(/,/g, " ");
+const metric = () => D.metrics.find((m) => m.id === state.metric);
+const unitSuffix = (m) => m.unit === "pts" ? "" : " " + m.unit;
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const nm = (c) => c.maker && c.maker !== "Apple" ? `${c.maker} ${c.name}` : c.name;
+
+const copy = {
+  grid: {
+    title: "Every Apple Silicon chip, by generation and tier",
+    sc: "Colored by Geekbench 6 single-core. Tier barely matters here: a base chip is as fast per core as an Ultra of the same generation.",
+    mc: "Colored by Geekbench 6 multi-core. Tier matters more than generation: an M1 Ultra still beats an M5.",
+    gpu: "Colored by Geekbench 6 GPU (Metal). The widest spread on the page, driven almost entirely by GPU core count.",
+    bw: "Colored by unified memory bandwidth, the number that matters most for running large AI models locally.",
+  },
+  lines: {
+    title: "How each tier has improved, M1 to M6",
+    sc: "Geekbench 6 single-core. The four tiers move together because they share the same CPU cores.",
+    mc: "Geekbench 6 multi-core. Each tier climbs on its own line; the gaps between them are core count.",
+    gpu: "Geekbench 6 GPU (Metal). Max and Ultra pull away fastest.",
+    bw: "Unified memory bandwidth in GB/s, from Apple's specs.",
+  },
+};
+
+// Heat ramp, shared by the grid tiles and (sampled) by the tier line colors.
+const STOPS = ["#2E1C44", "#6B2366", "#B5385B", "#E66A3A", "#F6B24A", "#FBEC9E"];
+const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+function heat(t) {
+  t = Math.max(0, Math.min(1, t));
+  const p = t * (STOPS.length - 1), i = Math.min(STOPS.length - 2, Math.floor(p)), f = p - i;
+  const a = hex(STOPS[i]), b = hex(STOPS[i + 1]);
+  const c = a.map((x, k) => Math.round(x + (b[k] - x) * f));
+  const lum = (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255;
+  return { bg: `rgb(${c.join(",")})`, fg: lum > 0.55 ? "#1A0F17" : "#FFFFFF" };
+}
+
+// Header controls
+const tabs = document.getElementById("tabs");
+D.metrics.forEach((m) => {
+  const b = document.createElement("button");
+  b.className = "tab"; b.role = "tab"; b.textContent = m.short; b.dataset.m = m.id;
+  b.onclick = () => { state.metric = m.id; render(); };
+  tabs.appendChild(b);
+});
+document.querySelectorAll("[data-view]").forEach((b) => b.onclick = () => {
+  if (state.view === b.dataset.view) return;
+  state.view = b.dataset.view; render(true);
+});
+document.getElementById("theme").onclick = () => {
+  const r = document.documentElement; r.dataset.theme = r.dataset.theme === "dark" ? "light" : "dark"; render();
+};
+// Keyboard: G and L switch views.
+addEventListener("keydown", (e) => {
+  if (e.target.closest("input, select, textarea") || e.metaKey || e.ctrlKey) return;
+  if (e.key === "g" || e.key === "l") { const v = e.key === "g" ? "grid" : "lines"; if (state.view !== v) { state.view = v; render(true); } }
+});
+
+function toggle(id) {
+  state.picks = state.picks.includes(id) ? state.picks.filter((x) => x !== id) : [...state.picks, id].slice(-2);
+  render();
+}
+
+// ---------- Grid view ----------
+function tile(c, t) {
+  const m = metric(), v = c[m.id];
+  if (v == null) return `<div class="gap">No ${m.id === "gpu" ? "GPU" : m.short.toLowerCase()} result</div>`;
+  const h = heat(t(v));
+  const idx = state.picks.indexOf(c.id);
+  return `<button class="tile" data-id="${c.id}" aria-pressed="${idx >= 0}" style="background:${h.bg};color:${h.fg}">
+    ${idx >= 0 ? `<span class="badge">${idx ? "B" : "A"}</span>` : ""}
+    <span class="nm">${c.name}</span>
+    <span><span class="v">${fmt(v)}<small>${unitSuffix(m)}</small></span>${c.est ? ` <span class="est">estimate</span>` : ""}</span></button>`;
+}
+function renderGrid(root, fresh) {
+  const k = state.metric;
+  const vals = all.map((c) => c[k]).filter((v) => v != null);
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const t = (v) => (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo));
+  let html = `<div></div>` + D.gens.map((g) => `<div class="colhead"><b>${g.label}</b><span>${g.year}</span></div>`).join("");
+  D.tiers.forEach((tr) => {
+    html += `<div class="rowhead"><i style="background:var(--${tr.id})"></i>${tr.label}</div>`;
+    D.gens.forEach((g) => {
+      const c = D.chips.find((x) => x.gen === g.gen && x.tier === tr.id);
+      html += c ? tile(c, t) : `<div class="gap">${D.gaps[`${g.gen}-${tr.id}`] || ""}</div>`;
+    });
+  });
+  let grid = root.querySelector(".grid");
+  if (fresh || !grid) {
+    root.innerHTML = `<div class="grid-scroll"><div class="grid"></div></div><div class="under"><div class="legend"></div><div class="scale-row"></div></div>`;
+    grid = root.querySelector(".grid"); grid.innerHTML = html;
+  } else {
+    // Patch tiles in place so a metric change re-heats them instead of popping.
+    const tmp = document.createElement("div"); tmp.innerHTML = html;
+    [...tmp.children].forEach((n, i) => {
+      const old = grid.children[i];
+      if (old && n.classList.contains("tile") && old.classList.contains("tile")) {
+        old.style.background = n.style.background; old.style.color = n.style.color;
+        old.innerHTML = n.innerHTML; old.setAttribute("aria-pressed", n.getAttribute("aria-pressed"));
+      } else if (old) old.replaceWith(n);
+    });
+  }
+  grid.querySelectorAll(".tile").forEach((b) => b.onclick = () => toggle(b.dataset.id));
+  const u = unitSuffix(metric());
+  root.querySelector(".legend").innerHTML = `<span>${fmt(lo)}${u}</span><span class="ramp" style="background:linear-gradient(90deg, ${STOPS.join(",")})"></span><span>${fmt(hi)}${u}</span>`;
+  const sr = root.querySelector(".scale-row");
+  sr.innerHTML = `<span class="lab">For scale</span>` + D.references.map((r) => tile({ ...r, name: nm(r) }, t)).join("");
+  sr.querySelectorAll(".tile").forEach((b) => b.onclick = () => toggle(b.dataset.id));
+}
+
+// ---------- Lines view ----------
+function renderLines(root, fresh) {
+  if (fresh || !root.querySelector(".chart")) {
+    root.innerHTML = `<div class="toolbar"><div class="toggles" id="tierT"></div><span class="lab">For scale</span><div class="toggles" id="refT"></div><div class="spacer"></div>
+      <div class="seg small" role="group" aria-label="Scale"><button data-scale="linear">Linear</button><button data-scale="log">Log</button></div></div>
+      <div class="chart-wrap"><svg class="chart" role="img" aria-label="Scores by generation, one line per tier"></svg><div class="tip"></div></div>
+      <p class="note">Hollow points are estimates. Click any point to add it to the comparison below.</p>`;
+    root.querySelectorAll("[data-scale]").forEach((b) => b.onclick = () => { state.scale = b.dataset.scale; render(); });
+    new ResizeObserver(() => drawChart(root, false)).observe(root.querySelector(".chart-wrap"));
+  }
+  root.querySelectorAll("[data-scale]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.scale === state.scale));
+  root.querySelector("#tierT").innerHTML = D.tiers.map((t) => `<button class="toggle" data-t="${t.id}" aria-pressed="${state.tiers.has(t.id)}"><i style="background:var(--${t.id})"></i>${t.label}</button>`).join("");
+  root.querySelector("#refT").innerHTML = D.references.map((r) => `<button class="toggle" data-r="${r.id}" aria-pressed="${state.refs.has(r.id)}"><i style="background:var(--ref)"></i>${nm(r)}</button>`).join("");
+  root.querySelectorAll("[data-t]").forEach((b) => b.onclick = () => { const s = state.tiers; s.has(b.dataset.t) ? s.delete(b.dataset.t) : s.add(b.dataset.t); render(); });
+  root.querySelectorAll("[data-r]").forEach((b) => b.onclick = () => { const s = state.refs; s.has(b.dataset.r) ? s.delete(b.dataset.r) : s.add(b.dataset.r); render(); });
+  drawChart(root, fresh);
+}
+
+function drawChart(root, animate) {
+  const wrap = root.querySelector(".chart-wrap"), svg = root.querySelector(".chart"), tip = root.querySelector(".tip");
+  if (!wrap) return;
+  const W = wrap.clientWidth, H = Math.max(320, Math.min(500, W * 0.48));
+  const m = { t: 16, r: W < 600 ? 72 : 110, b: 48, l: 56 };
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+  const key = state.metric;
+  const chips = D.chips.filter((c) => state.tiers.has(c.tier) && c[key] != null);
+  const refs = D.references.filter((r) => state.refs.has(r.id) && r[key] != null);
+  const vals = [...chips, ...refs].map((c) => c[key]);
+  if (!vals.length) { svg.innerHTML = `<text x="0" y="40" fill="${css("--muted")}">Turn on a tier above to see its line.</text>`; return; }
+  const log = state.scale === "log";
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if (log) { lo /= 1.15; hi *= 1.1; } else { const pad = (hi - lo) * 0.08 || hi * 0.1; lo = Math.max(0, lo - pad); hi += pad; }
+  const y = (v) => m.t + (1 - (log ? (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo)) : (v - lo) / (hi - lo))) * (H - m.t - m.b);
+  const x = (g) => m.l + ((g - 1) / 5) * (W - m.l - m.r);
+  const ticks = niceTicks(lo, hi, log);
+  let out = `<g class="gridlines">${ticks.map((t) => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}"/>`).join("")}</g><g class="axis">`;
+  out += ticks.map((t) => `<text x="${m.l - 10}" y="${y(t) + 4}" text-anchor="end">${short(t)}</text>`).join("");
+  out += D.gens.map((g) => `<text x="${x(g.gen)}" y="${H - m.b + 22}" text-anchor="middle">${g.label}</text><text class="year" x="${x(g.gen)}" y="${H - m.b + 38}" text-anchor="middle">${g.year}</text>`).join("") + `</g>`;
+  out += `<g class="refl">${refs.map((r) => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(r[key])}" y2="${y(r[key])}"/><text x="${m.l + 6}" y="${y(r[key]) - 7}">${nm(r)} at ${short(r[key])}</text>`).join("")}</g>`;
+  const labels = [];
+  D.tiers.forEach((t) => {
+    const pts = chips.filter((c) => c.tier === t.id).sort((a, b) => a.gen - b.gen);
+    if (!pts.length) return;
+    const color = css(`--${t.id}`);
+    out += `<g class="series"><path class="line" stroke="${color}" d="${pts.map((c, i) => `${i ? "L" : "M"}${x(c.gen)},${y(c[key])}`).join("")}"/>`;
+    out += pts.map((c) => `<circle class="pt${c.est ? " est" : ""}" cx="${x(c.gen)}" cy="${y(c[key])}" r="4.5" fill="${color}" stroke="${color}" stroke-width="2"/>`).join("") + `</g>`;
+    const last = pts[pts.length - 1];
+    labels.push({ t, color, x: x(last.gen) + 12, y: y(last[key]), v: last[key] });
+  });
+  labels.sort((a, b) => a.y - b.y);
+  for (let i = 1; i < labels.length; i++) if (labels[i].y - labels[i - 1].y < 34 && Math.abs(labels[i].x - labels[i - 1].x) < 80) labels[i].y = labels[i - 1].y + 34;
+  out += labels.map((l) => `<text class="end-label" x="${l.x}" y="${l.y + 1}" fill="${l.color}">${l.t.label}</text><text class="end-value" x="${l.x}" y="${l.y + 16}">${fmt(l.v)}</text>`).join("");
+  state.picks.forEach((id, i) => {
+    const c = chips.find((p) => p.id === id); if (!c) return;
+    const cx = x(c.gen), cy = y(c[key]);
+    out += `<circle class="ring" cx="${cx}" cy="${cy}" r="9"/><circle class="ring-badge" cx="${cx - 14}" cy="${cy - 14}" r="8"/><text class="ring-badge-t" x="${cx - 14}" y="${cy - 10}" text-anchor="middle">${i ? "B" : "A"}</text>`;
+  });
+  svg.innerHTML = out;
+  if (animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    svg.querySelectorAll("path.line").forEach((p, i) => {
+      const len = p.getTotalLength();
+      p.animate([{ strokeDasharray: len, strokeDashoffset: len }, { strokeDasharray: len, strokeDashoffset: 0 }], { duration: 800, delay: i * 80, easing: "cubic-bezier(.2,.7,.2,1)", fill: "backwards" });
+    });
+  }
+  const pts = chips.map((c) => ({ c, px: x(c.gen), py: y(c[key]) }));
+  let hovered = null;
+  svg.onmousemove = (e) => {
+    const r = svg.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    hovered = null; let bd = 26;
+    pts.forEach((p) => { const d = Math.hypot(p.px - mx, p.py - my); if (d < bd) { bd = d; hovered = p; } });
+    svg.style.cursor = hovered ? "pointer" : "";
+    if (!hovered) return tip.classList.remove("on");
+    const c = hovered.c;
+    const prev = D.chips.filter((p) => p.tier === c.tier && p.gen < c.gen).sort((a, b) => b.gen - a.gen)[0];
+    const d = prev ? `${pct(c[key], prev[key])} vs ${prev.name}` : "First of its tier";
+    tip.innerHTML = `<b>${c.name}</b> <span class="m">${c.year}</span><div class="big">${fmt(c[key])}<span class="m" style="font-size:13px;font-weight:400"> ${metric().unit}</span></div><div class="m">${d}</div>${c.est ? `<div class="m">Estimate, not yet sourced</div>` : ""}`;
+    tip.style.left = Math.min(hovered.px + 16, W - 210) + "px"; tip.style.top = Math.max(0, hovered.py - 90) + "px";
+    tip.classList.add("on");
+  };
+  svg.onmouseleave = () => tip.classList.remove("on");
+  svg.onclick = () => { if (hovered) toggle(hovered.c.id); };
+}
+function niceTicks(lo, hi, log) {
+  const out = [];
+  if (log) {
+    for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++) [1, 2, 5].forEach((s) => { const v = s * 10 ** e; if (v >= lo && v <= hi) out.push(v); });
+    return out;
+  }
+  const span = hi - lo, mag = 10 ** Math.floor(Math.log10(span / 5));
+  const step = [1, 2, 2.5, 5, 10].map((s) => s * mag).find((s) => span / s <= 6);
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) out.push(v);
+  return out;
+}
+const short = (v) => v >= 10000 ? (v / 1000).toFixed(1).replace(/\.0$/, "") + "k" : fmt(v);
+const pct = (a, b) => { const p = Math.round((a / b - 1) * 100); return (p >= 0 ? "+" : "") + p + "%"; };
+
+// ---------- Head-to-head ----------
+function renderH2H() {
+  const el = document.getElementById("h2h");
+  const [a, b] = state.picks.map((id) => byId[id]);
+  const where = state.view === "grid" ? "tiles in the grid" : "points on the chart";
+  if (!a || !b) {
+    el.innerHTML = `<div class="h2h-head"><h2>${a ? nm(a) : "Pick two chips"}</h2><span class="hint">${a ? "Pick one more to compare." : `Click any two ${where} to compare them side by side.`}</span></div>`;
+    return;
+  }
+  const maxAbs = Math.max(...D.metrics.map((m) => a[m.id] && b[m.id] ? Math.abs(b[m.id] / a[m.id] - 1) : 0), 0.01);
+  const rows = D.metrics.map((m) => {
+    const va = a[m.id], vb = b[m.id];
+    if (va == null || vb == null) return `<span class="k">${m.label}</span><span class="a">${fmt(va)}</span><div class="div"></div><span class="b">${fmt(vb)}</span>`;
+    const p = (vb / va - 1) * 100, w = (Math.abs(p) / 100 / maxAbs) * 46, cls = p >= 0 ? "up" : "down";
+    return `<span class="k">${m.label}</span><span class="a">${fmt(va)}</span><div class="div"><i class="${cls}" style="width:${w}%"></i></div>
+      <span class="b">${fmt(vb)}${unitSuffix(m)}<small class="pct ${cls}">${p >= 0 ? "+" : ""}${Math.round(p)}%</small></span>`;
+  }).join("");
+  const spec = (label, f) => `<span class="k">${label}</span><span class="a">${f(a)}</span><span></span><span class="b">${f(b)}</span>`;
+  el.innerHTML = `<div class="h2h-head"><h2>${nm(a)}<span class="vs">vs</span>${nm(b)}</h2><span class="hint">How much faster ${nm(b)} is. Click ${where} to change the pair.</span></div>
+  <div class="rows">${rows}<div class="sep"></div>
+    ${spec("CPU cores", (c) => `${c.pc + c.ec} (${c.pc}P + ${c.ec}E)`)}
+    ${spec("GPU cores", (c) => c.gpuc ?? "–")}
+    ${spec("Max memory", (c) => c.mem + " GB")}
+    ${spec("Ships in", (c) => `<span class="ships">${c.devices ? c.devices.join(", ") : c.note}</span>`)}
+  </div>`;
+}
+
+let lastView = null;
+function render(viewChanged) {
+  const fresh = viewChanged || lastView !== state.view;
+  document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", t.dataset.m === state.metric));
+  document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.view === state.view));
+  document.getElementById("title").textContent = copy[state.view].title;
+  document.getElementById("lede").textContent = copy[state.view][state.metric];
+  const root = document.getElementById("view");
+  if (fresh) { root.className = ""; void root.offsetWidth; root.className = "view"; }
+  state.view === "grid" ? renderGrid(root, fresh) : renderLines(root, fresh);
+  lastView = state.view;
+  renderH2H();
+  const p = new URLSearchParams({ view: state.view, m: state.metric, pick: state.picks.join(",") });
+  history.replaceState(null, "", "?" + p);
+}
+render(true);
+</script>
+</body>
+</html>

@@ -127,6 +127,17 @@ All three prototypes use the same sample data (`data.js`, Geekbench 6) so the co
 
 ---
 
+## D. Hybrid (current direction)
+
+Feedback on A–C: B is out. C's grid is the favourite, but people should be able to switch to A's lines. Both needed a true black, full-contrast background like slopalytics instead of a tinted dark grey.
+
+- **Background:** pure `#000000` with white text. Surfaces are separated by hairlines (`#222`, `#333`), not grey fills. Light mode mirrors it with pure white.
+- **One color system:** the grid's heat ramp is the identity. Tier line colors are sampled from it, hotter tier means hotter color: Base `#D2477E`, Pro `#EE6A3C`, Max `#F6AE45`, Ultra `#FCE89A`.
+- **Type:** Bricolage Grotesque, carried over from C.
+- **Views:** a Grid / Lines switch in the header (keys G and L). The metric, the two picked chips (A and B) and the head-to-head panel are shared, so switching views keeps your context. The view, metric and picks are in the URL.
+
+File: `design/d-hybrid.html`.
+
 ## Viewing
 
 Open any prototype directly in a browser, no build step:
@@ -134,6 +145,7 @@ Open any prototype directly in a browser, no build step:
 - `design/a-trajectory.html`
 - `design/b-index.html`
 - `design/c-grid.html`
+- `design/d-hybrid.html` (current)
 
 Useful URL parameters: `?theme=light`, `?m=sc|mc|gpu|bw` (A, C), `?sort=…&base=m1&pick=m1,m6&refs` (B), `?pick=m1,m6` (C).
 
