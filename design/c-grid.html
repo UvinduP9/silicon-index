@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Silicon Index · C. Grid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #17131C; --ash: #2A2430; --ash-2: #342D3B; --line: #3A3242;
+  --text: #EDE7E1; --muted: #A69CAA; --faint: #6F6574; --ring: #FFF6E8;
+  --up: #F6B24A; --down: #8C7FA0;
+}
+[data-theme="light"] {
+  --bg: #EEECEF; --ash: #E0DCE2; --ash-2: #D5D0D8; --line: #CCC6CF;
+  --text: #1E1722; --muted: #5F5664; --faint: #958C99; --ring: #1E1722;
+  --up: #C4561F; --down: #6E6380;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font: 400 15px/24px "Bricolage Grotesque", system-ui, sans-serif; font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 6px; }
+
+.wrap { max-width: 1280px; margin: 0 auto; padding: 28px 40px 64px; }
+.top { display: flex; align-items: center; gap: 32px; }
+.wordmark { font-weight: 750; font-size: 18px; font-variation-settings: "opsz" 24; }
+.tabs { display: flex; gap: 2px; }
+.tab { padding: 6px 12px; border-radius: 8px; color: var(--muted); font-weight: 500; }
+.tab:hover { color: var(--text); }
+.tab[aria-selected="true"] { color: var(--text); background: var(--ash); }
+.spacer { flex: 1; }
+.theme { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; color: var(--muted); }
+.theme:hover { background: var(--ash); color: var(--text); }
+
+h1 { margin: 48px 0 6px; font-size: 40px; line-height: 44px; font-weight: 650; letter-spacing: -0.02em; font-variation-settings: "opsz" 72; max-width: 22ch; }
+.lede { margin: 0 0 32px; color: var(--muted); max-width: 64ch; }
+
+.grid { display: grid; grid-template-columns: 64px repeat(6, minmax(0, 1fr)); gap: 3px; }
+.colhead { padding: 0 4px 10px; }
+.colhead b { font-weight: 650; font-size: 15px; }
+.colhead span { color: var(--faint); font-size: 13px; margin-left: 6px; }
+.rowhead { display: flex; align-items: center; color: var(--muted); font-size: 14px; font-weight: 500; }
+.tile {
+  position: relative; min-height: 112px; border-radius: 6px; padding: 12px 14px;
+  display: flex; flex-direction: column; justify-content: space-between; text-align: left;
+  transition: background-color 450ms ease, color 450ms ease;
+}
+.tile .nm { font-size: 24px; line-height: 26px; font-weight: 700; letter-spacing: -0.02em; font-variation-settings: "opsz" 96; }
+.tile .v { font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 500; }
+.tile .v small { font-size: 12px; opacity: 0.7; margin-left: 2px; }
+.tile .est { font-size: 12px; opacity: 0.75; }
+.tile:hover { filter: brightness(1.08); }
+.tile[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--ring), 0 0 0 2px var(--bg); }
+.tile .pick { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--ring); color: var(--bg); }
+.gap {
+  min-height: 112px; border-radius: 6px; border: 1.5px dashed var(--line);
+  display: flex; align-items: flex-end; padding: 12px 14px; color: var(--faint); font-size: 13px;
+}
+
+.under { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; margin: 18px 0 0 67px; flex-wrap: wrap; }
+.legend { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.ramp { width: 220px; height: 10px; border-radius: 5px; }
+.scale-row { display: flex; gap: 3px; align-items: stretch; }
+.scale-row .lab { color: var(--muted); font-size: 13px; align-self: center; margin-right: 10px; }
+.scale-row .tile { min-height: 64px; width: 190px; padding: 10px 12px; }
+.scale-row .tile .nm { font-size: 16px; line-height: 20px; font-variation-settings: "opsz" 24; }
+.scale-row .gap { min-height: 64px; width: 190px; }
+
+.h2h { margin-top: 48px; border-top: 1px solid var(--line); padding-top: 28px; }
+.h2h-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.h2h h2 { margin: 0; font-size: 32px; line-height: 36px; font-weight: 700; letter-spacing: -0.02em; font-variation-settings: "opsz" 72; }
+.h2h h2 .vs { color: var(--faint); font-weight: 400; margin: 0 10px; }
+.h2h .hint { color: var(--muted); font-size: 14px; }
+.rows { margin-top: 20px; display: grid; grid-template-columns: 150px 120px minmax(0, 1fr) 140px; gap: 10px 20px; align-items: center; font-variant-numeric: tabular-nums; }
+.rows .k { color: var(--muted); font-size: 14px; }
+.rows .a { text-align: right; }
+.rows .b { font-weight: 600; }
+.div { position: relative; height: 22px; }
+.div::before { content: ""; position: absolute; left: 50%; top: -4px; bottom: -4px; width: 1px; background: var(--line); }
+.div i { position: absolute; top: 6px; height: 10px; border-radius: 3px; }
+.div i.up { left: 50%; background: var(--up); }
+.div i.down { right: 50%; background: var(--down); }
+.div span { position: absolute; top: 0; font-size: 13px; color: var(--muted); }
+.pct { display: block; font-size: 13px; font-weight: 500; line-height: 16px; }
+.pct.up { color: var(--up); } .pct.down { color: var(--down); }
+.rows .sep { grid-column: 1 / -1; height: 1px; background: var(--line); margin: 6px 0; }
+.ships { color: var(--muted); font-size: 14px; }
+.foot { color: var(--faint); font-size: 13px; margin-top: 32px; }
+
+@media (max-width: 900px) {
+  .wrap { padding: 18px 16px 48px; }
+  .top { flex-wrap: wrap; gap: 10px 16px; }
+  .tabs { order: 3; width: 100%; overflow-x: auto; }
+  h1 { font-size: 28px; line-height: 32px; margin-top: 28px; }
+  .grid-scroll { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+  .grid { min-width: 720px; }
+  .under { margin-left: 0; }
+  .rows { grid-template-columns: 90px 72px minmax(0, 1fr) 72px; gap: 8px 10px; font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="wordmark">Silicon Index</div>
+    <nav class="tabs" role="tablist" aria-label="Metric" id="tabs"></nav>
+    <div class="spacer"></div>
+    <button class="theme" id="theme" aria-label="Switch to light mode" title="Switch theme">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+    </button>
+  </header>
+
+  <h1 id="title">Every Apple Silicon chip, by generation and tier</h1>
+  <p class="lede" id="lede"></p>
+
+  <div class="grid-scroll"><div class="grid" id="grid"></div></div>
+  <div class="under">
+    <div class="legend" id="legend"></div>
+    <div class="scale-row" id="scaleRow"></div>
+  </div>
+
+  <section class="h2h" id="h2h" aria-live="polite"></section>
+  <p class="foot">Prototype. Sample Geekbench 6 numbers, not yet verified. Color uses a log scale so small chips stay distinguishable.</p>
+</div>
+
+<script src="data.js"></script>
+<script>
+const D = window.SI;
+const q = new URLSearchParams(location.search);
+if (q.get("theme") === "light") document.documentElement.dataset.theme = "light";
+const state = { metric: q.get("m") || "mc", picks: (q.get("pick") || "m1,m6").split(",") };
+const all = [...D.chips, ...D.references];
+const byId = Object.fromEntries(all.map((c) => [c.id, c]));
+const fmt = (v) => v == null ? "–" : v.toLocaleString("en-US").replace(/,/g, " ");
+const metric = () => D.metrics.find((m) => m.id === state.metric);
+const ledes = {
+  sc: "Colored by Geekbench 6 single-core. Notice how little the tier matters: a base chip is as fast per core as an Ultra of the same generation.",
+  mc: "Colored by Geekbench 6 multi-core. Tier matters more than generation here: an M1 Ultra still beats an M5.",
+  gpu: "Colored by Geekbench 6 GPU (Metal). The biggest spread on the page, driven almost entirely by GPU core count.",
+  bw: "Colored by unified memory bandwidth, the number that matters most for running large AI models locally.",
+};
+
+// Thermal ramp, dark to bright.
+const STOPS = ["#2E1C44", "#6B2366", "#B5385B", "#E66A3A", "#F6B24A", "#FBEC9E"];
+const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+function heat(t) {
+  t = Math.max(0, Math.min(1, t));
+  const p = t * (STOPS.length - 1), i = Math.min(STOPS.length - 2, Math.floor(p)), f = p - i;
+  const a = hex(STOPS[i]), b = hex(STOPS[i + 1]);
+  const c = a.map((x, k) => Math.round(x + (b[k] - x) * f));
+  const lum = (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255;
+  return { bg: `rgb(${c.join(",")})`, fg: lum > 0.55 ? "#22141F" : "#FBF3EA" };
+}
+
+const tabs = document.getElementById("tabs");
+D.metrics.forEach((m) => {
+  const b = document.createElement("button");
+  b.className = "tab"; b.role = "tab"; b.textContent = m.short; b.dataset.m = m.id;
+  b.onclick = () => { state.metric = m.id; render(); };
+  tabs.appendChild(b);
+});
+document.getElementById("theme").onclick = () => {
+  const r = document.documentElement; r.dataset.theme = r.dataset.theme === "dark" ? "light" : "dark";
+};
+
+function toggle(id) {
+  if (state.picks.includes(id)) state.picks = state.picks.filter((x) => x !== id);
+  else state.picks = [...state.picks, id].slice(-2);
+  render();
+}
+
+function tile(c, t) {
+  const k = state.metric, v = c[k];
+  if (v == null) return `<div class="gap">No ${metric().short === "GPU" ? "GPU" : metric().short.toLowerCase()} result</div>`;
+  const h = heat(t(v));
+  const idx = state.picks.indexOf(c.id);
+  return `<button class="tile" data-id="${c.id}" aria-pressed="${idx >= 0}" style="background:${h.bg};color:${h.fg}">
+    ${idx >= 0 ? `<span class="pick">${idx ? "B" : "A"}</span>` : ""}
+    <span class="nm">${c.name}</span>
+    <span><span class="v">${fmt(v)}<small>${metric().unit === "pts" ? "" : " " + metric().unit}</small></span>${c.est ? ` <span class="est">estimate</span>` : ""}</span>
+  </button>`;
+}
+
+function render() {
+  const k = state.metric;
+  document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", t.dataset.m === k));
+  document.getElementById("lede").textContent = ledes[k];
+  const vals = all.map((c) => c[k]).filter((v) => v != null);
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const t = (v) => (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo));
+
+  let html = `<div></div>` + D.gens.map((g) => `<div class="colhead"><b>${g.label}</b><span>${g.year}</span></div>`).join("");
+  D.tiers.forEach((tr) => {
+    html += `<div class="rowhead">${tr.label}</div>`;
+    D.gens.forEach((g) => {
+      const c = D.chips.find((x) => x.gen === g.gen && x.tier === tr.id);
+      html += c ? tile(c, t) : `<div class="gap">${D.gaps[`${g.gen}-${tr.id}`] || ""}</div>`;
+    });
+  });
+  const grid = document.getElementById("grid");
+  // Patch colors in place when the grid exists so tiles transition instead of popping.
+  if (grid.children.length) {
+    const tmp = document.createElement("div"); tmp.innerHTML = html;
+    [...tmp.children].forEach((n, i) => {
+      const old = grid.children[i];
+      if (old && old.className === n.className && n.classList.contains("tile")) {
+        old.style.background = n.style.background; old.style.color = n.style.color;
+        old.innerHTML = n.innerHTML; old.setAttribute("aria-pressed", n.getAttribute("aria-pressed"));
+      } else if (old) old.replaceWith(n.cloneNode(true));
+    });
+  } else grid.innerHTML = html;
+  grid.querySelectorAll(".tile").forEach((b) => b.onclick = () => toggle(b.dataset.id));
+
+  const ramp = `linear-gradient(90deg, ${STOPS.join(",")})`;
+  const unit = metric().unit === "pts" ? "" : " " + metric().unit;
+  document.getElementById("legend").innerHTML = `<span>${fmt(lo)}${unit}</span><span class="ramp" style="background:${ramp}"></span><span>${fmt(hi)}${unit}</span>`;
+  const sr = document.getElementById("scaleRow");
+  sr.innerHTML = `<span class="lab">For scale</span>` + D.references.map((r) => tile({ ...r, name: `${r.maker} ${r.name}` }, t)).join("");
+  sr.querySelectorAll(".tile").forEach((b) => b.onclick = () => toggle(b.dataset.id));
+
+  renderH2H();
+}
+
+function renderH2H() {
+  const el = document.getElementById("h2h");
+  const [a, b] = state.picks.map((id) => byId[id]);
+  if (!a || !b) {
+    el.innerHTML = `<div class="h2h-head"><h2>${a ? a.name : "Pick two chips"}</h2><span class="hint">${a ? "Click one more chip to compare." : "Click any two chips in the grid to compare them side by side."}</span></div>`;
+    return;
+  }
+  const nm = (c) => c.maker && c.maker !== "Apple" ? `${c.maker} ${c.name}` : c.name;
+  const ratios = D.metrics.map((m) => a[m.id] && b[m.id] ? Math.abs(b[m.id] / a[m.id] - 1) : 0);
+  const maxAbs = Math.max(...ratios, 0.01);
+  const rows = D.metrics.map((m) => {
+    const va = a[m.id], vb = b[m.id];
+    if (va == null || vb == null) return `<span class="k">${m.label}</span><span class="a">${fmt(va)}</span><div class="div"></div><span class="b">${fmt(vb)}</span>`;
+    const p = (vb / va - 1) * 100;
+    const w = (Math.abs(p) / 100 / maxAbs) * 46;
+    const lbl = `${p >= 0 ? "+" : ""}${Math.round(p)}%`;
+    return `<span class="k">${m.label}</span><span class="a">${fmt(va)}</span>
+      <div class="div"><i class="${p >= 0 ? "up" : "down"}" style="width:${w}%"></i></div>
+      <span class="b">${fmt(vb)}${m.unit === "pts" ? "" : " " + m.unit}<small class="pct ${p >= 0 ? "up" : "down"}">${lbl}</small></span>`;
+  }).join("");
+  const spec = (label, f) => `<span class="k">${label}</span><span class="a">${f(a)}</span><span></span><span class="b">${f(b)}</span>`;
+  el.innerHTML = `<div class="h2h-head"><h2>${nm(a)}<span class="vs">vs</span>${nm(b)}</h2><span class="hint">Bars show how much faster ${nm(b)} is. Click tiles to change the pair.</span></div>
+  <div class="rows">${rows}<div class="sep"></div>
+    ${spec("CPU cores", (c) => `${c.pc + c.ec} (${c.pc}P + ${c.ec}E)`)}
+    ${spec("GPU cores", (c) => c.gpuc ?? "–")}
+    ${spec("Max memory", (c) => c.mem + " GB")}
+    ${spec("Ships in", (c) => `<span class="ships">${c.devices ? c.devices.join(", ") : c.note}</span>`)}
+  </div>`;
+}
+render();
+</script>
+</body>
+</html>
