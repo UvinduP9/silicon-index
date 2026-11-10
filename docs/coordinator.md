@@ -2,7 +2,7 @@
 
 The coordinator runs the project in **ticks**. A tick is started on a schedule (and whenever a worker finishes). Each tick starts with no memory of the last one: GitHub is the only state. Read `VISION.md` and `AGENTS.md` first, then do the steps below in order.
 
-Repository: `UvinduP9/silicon-index`. Local checkout: `/Users/uvindup/Documents/silicon-index` (only `git pull` it; never edit files there during a tick). T3 project id for worker checkouts: `mcp:526c3c0a-a4cc-4c80-ae8d-794d385c3000`.
+Repository: `UvinduP9/silicon-index`. Local checkout: `/Users/uvindup/Documents/silicon-index` (only `git pull` it; never edit files there during a tick, except to update this playbook or the log when a gardener asks). Ticks run inside the T3 project for that checkout, so workers started with `delegate_task` get their own worktree of it.
 
 ## Limits
 
@@ -47,7 +47,7 @@ Count running workers (issues labelled `in-progress`). Fill free slots from `age
 
 Start each worker with `delegate_task`:
 
-- `isolation: "worktree"`, `role` matching the issue type (`implementation`, `research`, `design`), `target.projectId` set to the id above.
+- `isolation: "worktree"`, `mode: "async"`, `role` matching the issue type (`implementation`, `research`, `design`). Don't set `target.projectId`; the tick already runs in the project.
 - `title`: `#<n> <issue title>`
 - `task`: the brief below, filled in.
 
