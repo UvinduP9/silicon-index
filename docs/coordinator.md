@@ -4,6 +4,15 @@ The coordinator runs the project in **ticks**. A tick is started on a schedule (
 
 Repository: `UvinduP9/silicon-index`. Local checkout: `/Users/uvindup/Documents/silicon-index` (only `git pull` it; never edit files there during a tick, except to update this playbook or the log when a gardener asks). Ticks run inside the T3 project for that checkout, so workers started with `delegate_task` get their own worktree of it.
 
+## Model routing
+
+The coordinator stays on Claude Opus 5.5 (`claudeAgent_work`, `claude-opus-5-5`). Before dispatching, call `orchestrator_capabilities` once per thread and verify the required providers/models are available. Follow `AGENTS.md` model routing for workers, reviewers and fix-up tasks, using explicit `delegate_task.target` values:
+
+- UI/UX design, implementation or visual/usability review: `{"providerInstanceId":"claudeAgent_work","model":"claude-opus-5-5","options":{}}`.
+- All other work, including research, data, infra, logic, tests, docs and non-UI review: `{"providerInstanceId":"codex","model":"gpt-6.1-sol","options":{}}`.
+
+Empty options clear inherited provider-specific settings. Choose based on the actual work, not merely the issue label: frontend tooling is GPT work; layout and interaction design are Claude work. Split mixed work where practical. Never fall back to another model without a gardener's instruction. When adopting this policy, cancel any still-running non-UI Claude delegates with `task_cancel` and resume unfinished work with GPT-6.1 Sol while preserving existing branches and commits. Do not duplicate completed work.
+
 ## Limits
 
 - At most **3 workers** running at once, and at most **3 new dispatches per tick**.
@@ -48,6 +57,7 @@ Count running workers (issues labelled `in-progress`). Fill free slots from `age
 Start each worker with `delegate_task`:
 
 - `isolation: "worktree"`, `mode: "async"`, `role` matching the issue type (`implementation`, `research`, `design`). Don't set `target.projectId`; the tick already runs in the project.
+- `target`: the explicit provider/model from Model routing above (required for reviewers and follow-up fixes too).
 - `title`: `#<n> <issue title>`
 - `task`: the brief below, filled in.
 
