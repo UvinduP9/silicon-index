@@ -20,7 +20,6 @@ export function HeatTile({
   value,
   unit,
   color,
-  estimate = false,
   pick,
   onPress,
   size = "default",
@@ -30,7 +29,6 @@ export function HeatTile({
   value: string;
   unit?: string;
   color: HeatColor;
-  estimate?: boolean;
   pick?: "A" | "B";
   onPress?: () => void;
   size?: TileSize;
@@ -61,9 +59,6 @@ export function HeatTile({
             <small className="ml-0.5 text-caption opacity-70">{unit}</small>
           ) : null}
         </span>
-        {estimate ? (
-          <span className="ml-1 text-caption opacity-75">estimate</span>
-        ) : null}
       </span>
     </button>
   );

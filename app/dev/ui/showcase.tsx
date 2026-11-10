@@ -284,7 +284,6 @@ export function Showcase() {
                         value={String(s.value)}
                         unit="pts"
                         color={heat(s.value)}
-                        estimate={s.id === "D"}
                         pick={i < 0 ? undefined : i === 0 ? "A" : "B"}
                         onPress={() => togglePick(s.id)}
                       />
@@ -436,7 +435,7 @@ function TooltipDemo() {
           meta="Year"
           value="300"
           unit="pts"
-          notes={["+50% vs Sample B", "Estimate, not yet sourced"]}
+          notes={["+50% vs Sample B", "Single result"]}
           style={{ left: 0, top: 0 }}
         />
       </div>
