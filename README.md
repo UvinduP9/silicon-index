@@ -28,14 +28,18 @@ In priority order:
 
 ## Where it stands
 
-Design exploration, no production app yet.
+The app foundation is on main; the comparison interface is still a design prototype.
+
+- The Next.js app scaffold, TypeScript, Tailwind, static export and CI are merged ([#33](https://github.com/UvinduP9/silicon-index/pull/33)).
+- The data model, validation and CI data checks are merged ([#37](https://github.com/UvinduP9/silicon-index/pull/37)). The files in `data/` are empty; benchmark results have not been collected yet. See [docs/data-model.md](docs/data-model.md).
+- The workload taxonomy research is merged as a proposal for gardener review before collection ([#38](https://github.com/UvinduP9/silicon-index/pull/38)). See [docs/workloads.md](docs/workloads.md).
 
 - `design/d-hybrid.html` is the current direction: pure black, full contrast, with a **Grid** view (generation × tier heat map, the default) and a **Lines** view (one line per tier from M1 to M6). The chosen metric, two picked chips and the head-to-head comparison are shared across both views.
 - `design/a-trajectory.html`, `b-index.html` and `c-grid.html` are the earlier directions it came from. B was dropped.
 - `design/PLANS.md` has the reasoning behind each direction.
 - `design/data.js` is **sample data** for the prototypes. Some numbers are estimates; none are final.
 
-Open any file in `design/` directly in a browser. There is no build step.
+Open the HTML prototypes in `design/` directly in a browser; they need no build step. Use the commands below to run or build the app.
 
 ![The Lines view of the hybrid design](design/shots/d-lines.png)
 
