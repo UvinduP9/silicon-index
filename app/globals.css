@@ -1,31 +1,160 @@
 @import "tailwindcss";
 
-/* Pure black, full contrast. Tokens match design/d-hybrid.html. */
-:root {
+/*
+ * Silicon Index design tokens, ported from design/d-hybrid.html.
+ * Pure black, full contrast. Surfaces are separated by hairlines, not grey
+ * fills. Dark is the default; light is a matching pure-white theme.
+ *
+ * Theme resolution: an explicit choice sets data-theme on <html> (see
+ * lib/ui/theme.ts). With no choice, the system setting decides. Any element
+ * can carry data-theme to force a theme on its subtree.
+ */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
   --bg: #000000;
+  --raise: #0d0d0d;
+  --line: #222222;
+  --line-2: #333333;
   --text: #ffffff;
   --muted: #9a9a9a;
+  --faint: #5e5e5e;
   --ring: #ffffff;
+  /* Tier colors are sampled from the heat ramp: hotter tier, hotter color. */
+  --tier-base: #d2477e;
+  --tier-pro: #ee6a3c;
+  --tier-max: #f6ae45;
+  --tier-ultra: #fce89a;
+  --ref: #9a9a9a;
+  --up: #f6ae45;
+  --down: #9c8fb2;
 }
 
 [data-theme="light"] {
+  color-scheme: light;
   --bg: #ffffff;
+  --raise: #f4f4f4;
+  --line: #e4e4e4;
+  --line-2: #cfcfcf;
   --text: #000000;
   --muted: #5c5c5c;
+  --faint: #a0a0a0;
   --ring: #000000;
+  --tier-base: #a8285e;
+  --tier-pro: #c9461b;
+  --tier-max: #b87708;
+  --tier-ultra: #7a6400;
+  --ref: #6b6b6b;
+  --up: #c9461b;
+  --down: #6e6380;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg: #ffffff;
+    --raise: #f4f4f4;
+    --line: #e4e4e4;
+    --line-2: #cfcfcf;
+    --text: #000000;
+    --muted: #5c5c5c;
+    --faint: #a0a0a0;
+    --ring: #000000;
+    --tier-base: #a8285e;
+    --tier-pro: #c9461b;
+    --tier-max: #b87708;
+    --tier-ultra: #7a6400;
+    --ref: #6b6b6b;
+    --up: #c9461b;
+    --down: #6e6380;
+  }
+}
+
+:root {
+  /* Page gutter: 16px on small screens, 40px from 900px up. */
+  --gutter: 16px;
+}
+@media (min-width: 900px) {
+  :root {
+    --gutter: 40px;
+  }
 }
 
 @theme inline {
+  --color-*: initial;
   --color-bg: var(--bg);
+  --color-raise: var(--raise);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
   --color-text: var(--text);
   --color-muted: var(--muted);
+  --color-faint: var(--faint);
   --color-ring: var(--ring);
+  --color-tier-base: var(--tier-base);
+  --color-tier-pro: var(--tier-pro);
+  --color-tier-max: var(--tier-max);
+  --color-tier-ultra: var(--tier-ultra);
+  --color-ref: var(--ref);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
   --font-sans: var(--font-bricolage), system-ui, sans-serif;
+
+  --spacing-gutter: var(--gutter);
+}
+
+@theme {
+  /* Type scale. Bricolage's optical size axis is set per role in components. */
+  --text-*: initial;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-label: 13px;
+  --text-label--line-height: 20px;
+  --text-small: 14px;
+  --text-small--line-height: 20px;
+  --text-body: 15px;
+  --text-body--line-height: 24px;
+  --text-lead: 18px;
+  --text-lead--line-height: 24px;
+  --text-stat: 20px;
+  --text-stat--line-height: 28px;
+  --text-tile: 24px;
+  --text-tile--line-height: 26px;
+  --text-heading-sm: 28px;
+  --text-heading-sm--line-height: 32px;
+  --text-heading: 32px;
+  --text-heading--line-height: 36px;
+  --text-display: 40px;
+  --text-display--line-height: 44px;
+
+  --font-weight-wordmark: 750;
+  --font-weight-heading: 650;
+
+  --tracking-tight: -0.02em;
+
+  /* Spacing: Tailwind's 4px base plus the two odd gaps the prototype uses. */
+  --spacing: 4px;
+  --spacing-hair: 3px;
+  --spacing-px2: 2px;
+
+  --radius-tile: 6px;
+  --radius-control: 8px;
+  --radius-group: 10px;
+  --radius-pill: 999px;
+
+  --container-page: 1320px;
+
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --default-transition-duration: 150ms;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
   font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
 }
@@ -33,6 +162,7 @@ body {
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 3px;
+  border-radius: 6px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -40,6 +170,8 @@ body {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
