@@ -9,6 +9,14 @@ This project is built by AI agents, coordinated by an AI coordinator and tended 
 - **Workers**: take exactly one issue, do it on a branch, and open one pull request.
 - **Reviewers**: independent agents the coordinator asks to check a pull request against its issue.
 
+## Model routing
+
+- The gardener assistant and coordinator use Claude Opus 5.5 (`claudeAgent_work`, `claude-opus-5-5`).
+- Use Claude workers and reviewers only for UI/UX work where visual design, interaction, layout or usability judgment is the purpose.
+- Every other worker and reviewer uses GPT-6.1 Sol (`codex`, `gpt-6.1-sol`): research, data, infrastructure, schemas, application logic, tests, documentation and non-UI review.
+- Select the provider and model explicitly for every delegation; never inherit the coordinator's Claude model by default. Split mixed tasks when practical so Claude handles the UI/UX portion and GPT handles the rest.
+- If the required model is unavailable, report the blocker instead of substituting another model.
+
 ## The board
 
 Work is tracked as GitHub issues in `UvinduP9/silicon-index`, grouped by milestone (Phase 0 to Phase 4).
@@ -83,8 +91,7 @@ All of them must pass before you open a pull request: install, lint, typecheck, 
 ## Pull request conventions
 
 - Title: the issue title. Body: `Closes #<n>`, summary, verification, follow-ups.
-- End the body with: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
-- End commit messages with: `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+- Attribute pull requests and commits to the tool/model that actually did the work; do not credit Claude for GPT work.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
