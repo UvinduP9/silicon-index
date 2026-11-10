@@ -45,6 +45,21 @@ Open any file in `design/` directly in a browser. There is no build step.
 - Hand-built SVG charts, with d3 for scales and maths
 - Benchmark data as typed files in the repo, checked against a schema in CI, so a data update is a reviewable pull request
 
+## Develop
+
+You need the Node version in `.nvmrc` and pnpm (`corepack enable` installs the version pinned in `package.json`).
+
+```sh
+pnpm install
+pnpm dev        # http://localhost:3000
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build      # static site in out/
+```
+
+The full list, and what must pass before a pull request, is under Commands in [AGENTS.md](AGENTS.md).
+
 ## Roadmap
 
 The phases are in [VISION.md](VISION.md). Individual tasks are [GitHub issues](https://github.com/UvinduP9/silicon-index/issues), grouped by phase milestone.

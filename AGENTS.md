@@ -67,10 +67,31 @@ Reviewers check data pull requests by opening a sample of the cited URLs and con
 
 ## Commands
 
-Filled in by the scaffold issue. Until then there is nothing to run.
+Use the Node version in `.nvmrc` (run `nvm use`) and pnpm (`corepack enable` picks up the version in `package.json`).
+
+| Step | Command |
+|---|---|
+| Install | `pnpm install` |
+| Dev server | `pnpm dev` (http://localhost:3000) |
+| Lint and formatting check | `pnpm lint` (fix formatting with `pnpm format`) |
+| Typecheck | `pnpm typecheck` |
+| Test | `pnpm test` |
+| Build (static export to `out/`) | `pnpm build` |
+
+All of them must pass before you open a pull request: install, lint, typecheck, test and build must exit cleanly, and `pnpm dev` must start and serve the site. CI runs the same commands on every pull request and on pushes to `main`.
 
 ## Pull request conventions
 
 - Title: the issue title. Body: `Closes #<n>`, summary, verification, follow-ups.
 - End the body with: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
 - End commit messages with: `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
