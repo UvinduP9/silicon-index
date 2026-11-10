@@ -67,3 +67,14 @@ The phases are in [VISION.md](VISION.md). Individual tasks are [GitHub issues](h
 ## Design skill
 
 `.claude/skills/frontend-design` is Anthropic's frontend-design skill, vendored from [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills/frontend-design) under the Apache 2.0 license (see its `LICENSE.txt`). All design work in this repo goes through it.
+
+## Preview deployment
+
+`.github/workflows/pages.yml` exports and deploys the site on pushes to `main`.
+A gardener must enable **Settings → Pages → Build and deployment → Source:
+GitHub Actions**. The deployment uses the `github-pages` environment.
+
+Run `GITHUB_PAGES=true pnpm build` to export for `/silicon-index/`.
+Ordinary `pnpm dev` and `pnpm build` use the root path. Use Next.js `Link`
+for internal navigation so the configured base path is applied automatically.
+The live URL will be documented after Pages is enabled and a deployment succeeds.
