@@ -6,19 +6,60 @@ const base = { id, name: text };
 const positive = z.number().finite().positive();
 const citation = z.strictObject({ sourceId: id, locator: text });
 const fact = z.strictObject({ value: positive, citation });
+const textFact = z.strictObject({ value: text, citation });
+const dateFact = z.strictObject({ value: z.iso.date(), citation });
+const availability = z.discriminatedUnion("status", [
+  z.strictObject({ status: z.literal("made") }),
+  z.strictObject({
+    status: z.literal("not-made"),
+    reason: text,
+    note: text,
+    citation: citation.optional(),
+  }),
+]);
+const powerRange = z
+  .strictObject({ min: fact, max: fact })
+  .refine((r) => r.min.value <= r.max.value, {
+    message: "Minimum power must not exceed maximum",
+  });
 const metric = { metric: text, unit: text, higherIsBetter: z.boolean() };
 export const vendorSchema = z.strictObject(base);
-export const familySchema = z.strictObject({ ...base, vendorId: id });
+export const familySchema = z.strictObject({
+  ...base,
+  vendorId: id,
+  generation: text,
+  tier: text,
+  availability: availability.optional(),
+});
 export const configurationSchema = z.strictObject({
   ...base,
   familyId: id,
-  cores: z.array(z.strictObject({ kind: text, count: fact })).min(1),
-  powerWatts: fact.optional(),
+  cores: z
+    .array(
+      z.strictObject({
+        kind: z.enum([
+          "cpu-performance",
+          "cpu-efficiency",
+          "cpu-low-power-efficiency",
+          "cpu-dense",
+          "gpu",
+          "neural-engine",
+        ]),
+        count: fact,
+      }),
+    )
+    .min(1),
+  powerWatts: powerRange.optional(),
+  maximumMemoryGB: fact.optional(),
+  memoryBandwidthGBs: fact.optional(),
+  processNode: textFact.optional(),
+  releaseDate: dateFact.optional(),
+  availability: availability.optional(),
 });
 export const deviceSchema = z.strictObject({
   ...base,
   configurationId: id,
-  cooling: text,
+  cooling: z.enum(["fanless", "active"]),
   powerLimitWatts: fact.optional(),
 });
 export const benchmarkSchema = z.strictObject({
@@ -115,6 +156,25 @@ export const datasetSchema = z
       ]),
     );
     data.results.forEach((r, i) => {
+      const configurationId =
+        r.target.kind === "device"
+          ? data.devices.find((d) => d.id === r.target.id)?.configurationId
+          : r.target.id;
+      const configuration = data.configurations.find(
+        (c) => c.id === configurationId,
+      );
+      const family = data.families.find(
+        (f) => f.id === configuration?.familyId,
+      );
+      if (
+        configuration?.availability?.status === "not-made" ||
+        family?.availability?.status === "not-made"
+      )
+        ctx.addIssue({
+          code: "custom",
+          path: ["results", i, "target"],
+          message: "Results cannot target a not-made configuration or family",
+        });
       ref(
         r.target.kind === "device" ? "devices" : "configurations",
         r.target.id,

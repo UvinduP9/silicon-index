@@ -20,3 +20,282 @@ Results reference exactly one configuration or device and exactly one benchmark 
 Unknown power, device or software context is omitted, never inferred; use result notes to explain gaps. Required core counts must be sourced before a configuration can enter production. No composite scores are generated.
 
 Run `pnpm validate:data` to validate production files. CI runs this alongside tests. When adding another collection, extend both the schema and loader collection list and add reference tests.
+
+## Hardware vocabulary
+
+Families require vendor-neutral `generation` and `tier` strings. Optional `availability` is either `{ "status": "made" }` or `{ "status": "not-made", "reason": "<reason>", "note": "<evidence or scope note>" }`, with an optional citation. Omission means no absence claim. Results targeting an absent configuration or its family, including through a device, fail validation.
+
+Core kinds are `cpu-performance` (general or performance CPU cores, including homogeneous CPUs), `cpu-efficiency` (efficiency CPU cores), `cpu-low-power-efficiency` (separate low-power efficiency cores), `cpu-dense` (density-optimized CPU cores), `gpu` (graphics cores), and `neural-engine` (neural accelerator cores). Apply these roles consistently across Apple, Intel, AMD and Qualcomm; preserve the vendor's terminology in the configuration name. Do not count a core twice or infer a breakdown a source does not report.
+
+Configuration `powerWatts` has cited `min` and `max` facts, with min ≤ max. Device limits and result power remain single cited facts. Optional configuration facts are `maximumMemoryGB`, `memoryBandwidthGBs`, `processNode` (cited text preserving the source's process label), and `releaseDate` (cited ISO calendar date). Cooling is `fanless` or `active`.
+
+## JSON shape examples
+
+These are templates, not production records. Numeric placeholders are quoted to keep the templates valid JSON; replace them with sourced JSON numbers before validation. IDs and version placeholders must likewise be replaced. Every citation below refers to a source record carrying URL, publisher, accessed date and terms context.
+
+### Apple family and configuration
+
+```json
+{
+  "families": [
+    {
+      "id": "apple-family",
+      "name": "<Apple family name>",
+      "vendorId": "apple",
+      "generation": "<generation>",
+      "tier": "<tier>"
+    }
+  ],
+  "configurations": [
+    {
+      "id": "apple-config",
+      "name": "<configuration name>",
+      "familyId": "apple-family",
+      "cores": [
+        {
+          "kind": "cpu-performance",
+          "count": {
+            "value": "<value from source>",
+            "citation": {
+              "sourceId": "source-placeholder",
+              "locator": "<location on source page>"
+            }
+          }
+        },
+        {
+          "kind": "cpu-efficiency",
+          "count": {
+            "value": "<value from source>",
+            "citation": {
+              "sourceId": "source-placeholder",
+              "locator": "<location on source page>"
+            }
+          }
+        },
+        {
+          "kind": "gpu",
+          "count": {
+            "value": "<value from source>",
+            "citation": {
+              "sourceId": "source-placeholder",
+              "locator": "<location on source page>"
+            }
+          }
+        },
+        {
+          "kind": "neural-engine",
+          "count": {
+            "value": "<value from source>",
+            "citation": {
+              "sourceId": "source-placeholder",
+              "locator": "<location on source page>"
+            }
+          }
+        }
+      ],
+      "maximumMemoryGB": {
+        "value": "<value from source>",
+        "citation": {
+          "sourceId": "source-placeholder",
+          "locator": "<location on source page>"
+        }
+      },
+      "memoryBandwidthGBs": {
+        "value": "<value from source>",
+        "citation": {
+          "sourceId": "source-placeholder",
+          "locator": "<location on source page>"
+        }
+      },
+      "processNode": {
+        "value": "<value from source>",
+        "citation": {
+          "sourceId": "source-placeholder",
+          "locator": "<location on source page>"
+        }
+      },
+      "releaseDate": {
+        "value": "<YYYY-MM-DD from source>",
+        "citation": {
+          "sourceId": "source-placeholder",
+          "locator": "<location on source page>"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Intel configuration in two devices
+
+```json
+{
+  "families": [
+    {
+      "id": "intel-family",
+      "name": "<Intel family>",
+      "vendorId": "intel",
+      "generation": "<generation>",
+      "tier": "<tier>"
+    }
+  ],
+  "configurations": [
+    {
+      "id": "intel-config",
+      "name": "<configuration>",
+      "familyId": "intel-family",
+      "cores": [
+        {
+          "kind": "cpu-performance",
+          "count": {
+            "value": "<value from source>",
+            "citation": {
+              "sourceId": "source-placeholder",
+              "locator": "<location on source page>"
+            }
+          }
+        }
+      ],
+      "powerWatts": {
+        "min": {
+          "value": "<value from source>",
+          "citation": {
+            "sourceId": "source-placeholder",
+            "locator": "<location on source page>"
+          }
+        },
+        "max": {
+          "value": "<value from source>",
+          "citation": {
+            "sourceId": "source-placeholder",
+            "locator": "<location on source page>"
+          }
+        }
+      }
+    }
+  ],
+  "devices": [
+    {
+      "id": "intel-device-a",
+      "name": "<device A>",
+      "configurationId": "intel-config",
+      "cooling": "active",
+      "powerLimitWatts": {
+        "value": "<device A power from source>",
+        "citation": {
+          "sourceId": "source-placeholder",
+          "locator": "<location on source page>"
+        }
+      }
+    },
+    {
+      "id": "intel-device-b",
+      "name": "<device B>",
+      "configurationId": "intel-config",
+      "cooling": "active",
+      "powerLimitWatts": {
+        "value": "<device B power from source>",
+        "citation": {
+          "sourceId": "source-placeholder",
+          "locator": "<location on source page>"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Geekbench single-core result
+
+```json
+{
+  "benchmarks": [
+    {
+      "id": "benchmark-placeholder",
+      "name": "<benchmark or workload name>",
+      "version": "<explicit version>",
+      "metric": "single-core",
+      "unit": "points",
+      "higherIsBetter": true
+    }
+  ],
+  "results": [
+    {
+      "id": "result-placeholder",
+      "target": {
+        "kind": "device",
+        "id": "intel-device-a"
+      },
+      "measurement": {
+        "kind": "benchmark",
+        "id": "benchmark-placeholder"
+      },
+      "value": "<value from source>",
+      "citation": {
+        "sourceId": "source-placeholder",
+        "locator": "<location on source page>"
+      },
+      "sample": {
+        "kind": "single-result"
+      },
+      "powerWatts": {
+        "value": "<value from source>",
+        "citation": {
+          "sourceId": "source-placeholder",
+          "locator": "<location on source page>"
+        }
+      },
+      "softwareVersion": "<software version from source>"
+    }
+  ]
+}
+```
+
+### Local AI generation result
+
+```json
+{
+  "workloads": [
+    {
+      "id": "workload-placeholder",
+      "name": "<benchmark or workload name>",
+      "version": "<explicit version>",
+      "metric": "generation",
+      "unit": "tokens/s",
+      "higherIsBetter": true,
+      "profession": "Local AI",
+      "task": "<model, quantization, context and generation settings>",
+      "application": "<application>"
+    }
+  ],
+  "results": [
+    {
+      "id": "result-placeholder",
+      "target": {
+        "kind": "device",
+        "id": "intel-device-a"
+      },
+      "measurement": {
+        "kind": "workload",
+        "id": "workload-placeholder"
+      },
+      "value": "<value from source>",
+      "citation": {
+        "sourceId": "source-placeholder",
+        "locator": "<location on source page>"
+      },
+      "sample": {
+        "kind": "single-result"
+      },
+      "powerWatts": {
+        "value": "<value from source>",
+        "citation": {
+          "sourceId": "source-placeholder",
+          "locator": "<location on source page>"
+        }
+      },
+      "softwareVersion": "<software version from source>"
+    }
+  ]
+}
+```

@@ -15,6 +15,8 @@ const fixture = {
       id: "fixture-family",
       name: "Fixture family",
       vendorId: "fixture-vendor",
+      generation: "Fixture generation",
+      tier: "Fixture tier",
     },
   ],
   configurations: [
@@ -22,7 +24,7 @@ const fixture = {
       id: "fixture-config",
       name: "Fixture configuration",
       familyId: "fixture-family",
-      cores: [{ kind: "cpu", count: fact }],
+      cores: [{ kind: "cpu-performance", count: fact }],
     },
   ],
   devices: [
@@ -127,4 +129,69 @@ describe("data validation", () => {
       }).success,
     ).toBe(false);
   });
+});
+
+it("validates new hardware rules using synthetic facts only", () => {
+  const config = fixture.configurations[0]!;
+  const check = (patch: object) =>
+    datasetSchema.safeParse({
+      ...fixture,
+      configurations: [{ ...config, ...patch }],
+    }).success;
+  expect(
+    check({
+      maximumMemoryGB: fact,
+      memoryBandwidthGBs: fact,
+      processNode: { value: "Synthetic process", citation },
+      releaseDate: { value: "2026-01-01", citation },
+      powerWatts: { min: fact, max: fact },
+    }),
+  ).toBe(true);
+  for (const patch of [
+    { cores: [{ kind: "unknown", count: fact }] },
+    { processNode: { value: "Synthetic process" } },
+    { releaseDate: { value: "2026-01-01" } },
+    { releaseDate: { value: "invalid", citation } },
+    { powerWatts: { min: { value: 5, citation }, max: fact } },
+    {
+      availability: {
+        status: "not-made",
+        reason: "Synthetic absence",
+        note: "Test only",
+      },
+    },
+  ])
+    expect(check(patch)).toBe(false);
+  expect(
+    datasetSchema.safeParse({
+      ...fixture,
+      devices: [{ ...fixture.devices[0], cooling: "unknown" }],
+    }).success,
+  ).toBe(false);
+  for (const kind of ["device", "configuration"]) {
+    expect(
+      datasetSchema.safeParse({
+        ...fixture,
+        families: [
+          {
+            ...fixture.families[0],
+            availability: {
+              status: "not-made",
+              reason: "Synthetic absence",
+              note: "Test only",
+            },
+          },
+        ],
+        results: [
+          {
+            ...fixture.results[0],
+            target: {
+              kind,
+              id: kind === "device" ? "fixture-device" : "fixture-config",
+            },
+          },
+        ],
+      }).success,
+    ).toBe(false);
+  }
 });
