@@ -1,6 +1,8 @@
 # Silicon Index
 
-The best way to read Apple Silicon benchmarks.
+Help anyone pick the right computer for their work, using benchmark results that already exist.
+
+Read [VISION.md](VISION.md) for the goal, what makes this project worth doing, and the phases. Read [AGENTS.md](AGENTS.md) for how work gets done: this project is built by AI agents, coordinated by an AI coordinator and tended by human gardeners. Progress is logged in issue #1.
 
 ![The current design direction: every Apple Silicon chip in a generation-by-tier grid, colored by multi-core score](design/shots/d-grid.png)
 
@@ -22,7 +24,7 @@ In priority order:
 - **Design first.** The reason this project exists is that existing sites look bad and get in the way. Clarity, contrast and speed matter more than feature count.
 - **Honest data.** Every number carries its benchmark, version, source, date and sample count. Benchmark versions with different scales (Geekbench 6 and Geekbench 7) are never mixed on one axis. Estimates are marked as estimates.
 - **Chips and machines are different things.** The same chip comes in different core counts (M4 has 8, 9 and 10-core versions) and performs differently in a fanless MacBook Air than in a Mac Studio. The data model keeps chip family, configuration and device separate.
-- **Not Apple-only forever.** M-series first, but nothing in the data model is Apple-specific. Snapdragon, Intel and AMD chips can be added later as data, without a rewrite.
+- **Every vendor.** Apple first, then Intel, AMD and Qualcomm in the same data model.
 
 ## Where it stands
 
@@ -43,12 +45,9 @@ Open any file in `design/` directly in a browser. There is no build step.
 - Hand-built SVG charts, with d3 for scales and maths
 - Benchmark data as typed files in the repo, checked against a schema in CI, so a data update is a reviewable pull request
 
-## Open questions
+## Roadmap
 
-- More views beside Grid and Lines, such as price against performance?
-- Head-to-head with two chips, or up to four?
-- Which sources to start with, and how to keep them current
-- How the "what should I buy" flow should work
+The phases are in [VISION.md](VISION.md). Individual tasks are [GitHub issues](https://github.com/UvinduP9/silicon-index/issues), grouped by phase milestone.
 
 ## Design skill
 
